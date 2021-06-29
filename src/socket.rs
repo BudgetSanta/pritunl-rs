@@ -8,8 +8,6 @@ use crate::Client;
 pub enum RequestVerb {
     Get,
     Post,
-    Put,
-    Delete,
 }
 
 pub struct Response {
@@ -55,14 +53,12 @@ fn format_request(r: &Client, endpoint: &str, method: RequestVerb, body: &str) -
                 body
             )
         }
-        RequestVerb::Delete => todo!(),
-        RequestVerb::Put => todo!(),
     }
 }
 
 fn send_request(r: &Client, req: String) -> Response {
     let mut socket = &r.client;
-    socket.write(req.as_bytes()).unwrap();
+    socket.write_all(req.as_bytes()).unwrap();
 
     let mut res = Response::new();
     socket.read_to_string(&mut res.string_buffer).unwrap();

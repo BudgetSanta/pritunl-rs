@@ -1,7 +1,4 @@
-use crate::{
-    socket::{self, Response},
-    Client,
-};
+use crate::Client;
 
 impl Client {
     //pub fn put_token(&self) -> Response {

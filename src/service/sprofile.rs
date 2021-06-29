@@ -31,7 +31,7 @@ impl Client {
         socket::get(self, &format!("/sprofile/{}/log", id))
     }
 
-    pub fn delete_system_profile_log(&self, id: &str) -> Response {
-        socket::get(self, &format!("/sprofile/{}/log", id))
-    }
+    //pub fn delete_system_profile_log(&self, id: &str) -> Response {
+    //    socket::delete(self, &format!("/sprofile/{}/log", id))
+    //}
 }

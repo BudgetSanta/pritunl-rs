@@ -1,5 +1,10 @@
 use serde::{Deserialize, Serialize};
-use std::{fs, io::Error, os::unix::net::UnixStream, path::PathBuf};
+use std::{
+    fs,
+    io::Error,
+    os::unix::net::UnixStream,
+    path::{Path, PathBuf},
+};
 
 #[derive(Serialize, Deserialize)]
 pub struct Profile {
@@ -48,6 +53,12 @@ impl Client {
     }
 }
 
+impl Default for Client {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 fn get_auth_key() -> Result<String, Error> {
     fs::read_to_string("/var/run/pritunl.auth")
 }
@@ -60,20 +71,18 @@ fn get_profile_path() -> Result<PathBuf, ()> {
         .join("Library/Application Support/pritunl/profiles"))
 }
 
-fn load_profiles(profile_path: &PathBuf) -> Vec<Profile> {
+fn load_profiles(profile_path: &Path) -> Vec<Profile> {
     let profile_configs = fs::read_dir(profile_path).unwrap();
-    let profiles = profile_configs
+    profile_configs
         .filter_map(|x| x.ok())
         .map(|f| f.path())
         .filter(|f| match f.extension() {
             None => false,
             Some(ext) => ext == "conf",
         })
-        .map(|f| fs::read_to_string(f))
+        .map(fs::read_to_string)
         .filter_map(|x| x.ok())
         .map(|x| serde_json::from_str(&x))
         .filter_map(|x| x.ok())
-        .collect();
-
-    profiles
+        .collect()
 }
