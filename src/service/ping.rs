@@ -1,10 +1,9 @@
-use crate::{
-    socket::{self, Response},
-    Client,
-};
+use std::error::Error;
+
+use crate::{socket, Client};
 
 impl Client {
-    pub fn ping(&self) -> Response {
+    pub fn ping(&self) -> Result<String, Box<dyn Error>> {
         socket::get(self, "/ping")
     }
 }

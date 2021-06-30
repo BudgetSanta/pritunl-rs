@@ -1,5 +1,5 @@
 use std::{
-    fmt,
+    error::Error,
     io::{Read, Write},
 };
 
@@ -10,31 +10,12 @@ pub enum RequestVerb {
     Post,
 }
 
-pub struct Response {
-    pub string_buffer: String,
-}
-
-impl Response {
-    fn new() -> Self {
-        Response {
-            string_buffer: String::new(),
-        }
-    }
-}
-
-impl fmt::Display for Response {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        // TODO: Fix this mess
-        write!(f, "{}", self.string_buffer.as_str().trim())
-    }
-}
-
-pub fn get(r: &Client, endpoint: &str) -> Response {
+pub fn get(r: &Client, endpoint: &str) -> Result<String, Box<dyn Error>> {
     let req = format_request(r, endpoint, RequestVerb::Get, "");
     send_request(r, req)
 }
 
-pub fn post(r: &Client, endpoint: &str, json_body: &str) -> Response {
+pub fn post(r: &Client, endpoint: &str, json_body: &str) -> Result<String, Box<dyn Error>> {
     let req = format_request(r, endpoint, RequestVerb::Post, json_body);
     send_request(r, req)
 }
@@ -56,12 +37,13 @@ fn format_request(r: &Client, endpoint: &str, method: RequestVerb, body: &str) -
     }
 }
 
-fn send_request(r: &Client, req: String) -> Response {
+// TODO: More specific error
+fn send_request(r: &Client, req: String) -> Result<String, Box<dyn Error>> {
     let mut socket = &r.client;
     socket.write_all(req.as_bytes()).unwrap();
 
-    let mut res = Response::new();
-    socket.read_to_string(&mut res.string_buffer).unwrap();
+    let mut res = String::new();
+    socket.read_to_string(&mut res).unwrap();
 
-    res
+    Ok(res)
 }
