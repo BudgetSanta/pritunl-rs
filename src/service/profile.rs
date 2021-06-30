@@ -1,6 +1,6 @@
-use std::error::Error;
-
-use crate::{socket, Client};
+use crate::{socket, Client, Result};
+use serde::{Deserialize, Serialize};
+use std::io;
 
 // type Route struct {
 // NextHop    string `json:"next_hop"`
@@ -27,17 +27,19 @@ use crate::{socket, Client};
 // MacAddrs     []string `json:"mac_addrs"`
 // }
 
-struct Profile {
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Profile {
     id: String,
     mode: String,
     iface: String,
     tun_iface: String,
     //routes: Vec<Routes>,
     //routes6: Vec<Routes>,
-    reconect: bool,
+    reconnect: bool,
     status: String,
     timestamp: i64,
     gateway_addr: String,
+    gateway_addr6: String,
     server_addr: String,
     client_addr: String,
     mac_addr: String,
@@ -45,11 +47,12 @@ struct Profile {
 }
 
 impl Client {
-    pub fn get_profile(&self) -> Result<String, Box<dyn Error>> {
-        socket::get(self, "/profile")
+    pub fn get_profile(&self) -> Result<Profile> {
+        let res = socket::get(self, "/profile")?;
+        Ok(serde_json::from_str::<Profile>(&res.body)?)
     }
 
-    pub fn post_profile(&self, body: &str) -> Result<String, Box<dyn Error>> {
+    pub fn post_profile(&self, body: &str) -> std::result::Result<String, io::Error> {
         socket::post(self, "/profile", body)
     }
 

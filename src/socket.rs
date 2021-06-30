@@ -1,15 +1,31 @@
-use std::io::{self, Read, Write};
-
 use crate::Client;
+use std::io::{self, Read, Write};
 
 pub enum RequestVerb {
     Get,
     Post,
 }
 
-pub fn get(r: &Client, endpoint: &str) -> Result<String, io::Error> {
+pub struct Response {
+    pub success: bool,
+    pub headers: String,
+    pub body: String,
+}
+
+pub fn get(r: &Client, endpoint: &str) -> Result<Response, io::Error> {
     let req = format_request(r, endpoint, RequestVerb::Get, "");
-    send_request(r, req)
+
+    let req = send_request(r, req)?;
+    // TODO: Read in request buff and split it yourself
+    let mut parts = req.split("\r\n\r\n");
+    let headers = parts.next().expect("some headers").to_string();
+    let body = parts.next().expect("some body").to_string();
+    let success = headers[..].contains("200 OK");
+    Ok(Response {
+        headers,
+        body,
+        success,
+    })
 }
 
 pub fn post(r: &Client, endpoint: &str, json_body: &str) -> Result<String, io::Error> {

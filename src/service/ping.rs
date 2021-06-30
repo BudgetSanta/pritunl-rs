@@ -1,9 +1,8 @@
+use crate::{socket, Client};
 use std::io;
 
-use crate::{socket, Client};
-
 impl Client {
-    pub fn ping(&self) -> Result<String, io::Error> {
-        socket::get(self, "/ping")
+    pub fn ping(&self) -> Result<bool, io::Error> {
+        Ok(socket::get(self, "/ping")?.success)
     }
 }
