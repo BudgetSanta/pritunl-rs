@@ -1,10 +1,5 @@
-use crate::{
-    socket::{self, Response},
-    Client,
-};
-
-impl Client {
-    pub fn restart(&self, body: &str) -> Response {
-        socket::post(self, "/restart", body)
-    }
-}
+// impl Client {
+//     pub fn restart(&self, body: &str) -> Result<String, io::Error> {
+//         socket::post(self, "/restart", body)
+//     }
+// }

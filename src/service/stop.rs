@@ -1,10 +1,5 @@
-use crate::{
-    socket::{self, Response},
-    Client,
-};
-
-impl Client {
-    pub fn stop(&self, body: &str) -> Response {
-        socket::post(self, "/stop", body)
-    }
-}
+// impl Client {
+//     pub fn stop(&self, body: &str) -> Result<String, io::Error> {
+//         socket::post(self, "/stop", body)
+//     }
+// }
