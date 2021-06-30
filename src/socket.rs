@@ -1,7 +1,4 @@
-use std::{
-    error::Error,
-    io::{Read, Write},
-};
+use std::io::{self, Read, Write};
 
 use crate::Client;
 
@@ -10,12 +7,12 @@ pub enum RequestVerb {
     Post,
 }
 
-pub fn get(r: &Client, endpoint: &str) -> Result<String, Box<dyn Error>> {
+pub fn get(r: &Client, endpoint: &str) -> Result<String, io::Error> {
     let req = format_request(r, endpoint, RequestVerb::Get, "");
     send_request(r, req)
 }
 
-pub fn post(r: &Client, endpoint: &str, json_body: &str) -> Result<String, Box<dyn Error>> {
+pub fn post(r: &Client, endpoint: &str, json_body: &str) -> Result<String, io::Error> {
     let req = format_request(r, endpoint, RequestVerb::Post, json_body);
     send_request(r, req)
 }
@@ -37,13 +34,12 @@ fn format_request(r: &Client, endpoint: &str, method: RequestVerb, body: &str) -
     }
 }
 
-// TODO: More specific error
-fn send_request(r: &Client, req: String) -> Result<String, Box<dyn Error>> {
+fn send_request(r: &Client, req: String) -> Result<String, io::Error> {
     let mut socket = &r.client;
-    socket.write_all(req.as_bytes()).unwrap();
+    socket.write_all(req.as_bytes())?;
 
     let mut res = String::new();
-    socket.read_to_string(&mut res).unwrap();
+    socket.read_to_string(&mut res)?;
 
     Ok(res)
 }
