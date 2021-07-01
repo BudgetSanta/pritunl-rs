@@ -1,31 +1,7 @@
+use std::collections::HashMap;
+
 use crate::{socket, Client, Result};
 use serde::{Deserialize, Serialize};
-use std::io;
-
-// type Route struct {
-// NextHop    string `json:"next_hop"`
-// Network    string `json:"network"`
-// Metric     int    `json:"metric"`
-// NetGateway bool   `json:"net_gateway"`
-// }
-//
-// type Profile struct {
-// Id           string   `json:"id"`
-// Mode         string   `json:"mode"`
-// Iface        string   `json:"iface"`
-// Tuniface     string   `json:"tun_iface"`
-// Routes       []*Route `json:"routes'"`
-// Routes6      []*Route `json:"routes6'"`
-// Reconnect    bool     `json:"reconnect"`
-// Status       string   `json:"status"`
-// Timestamp    int64    `json:"timestamp"`
-// GatewayAddr  string   `json:"gateway_addr"`
-// GatewayAddr6 string   `json:"gateway_addr6"`
-// ServerAddr   string   `json:"server_addr"`
-// ClientAddr   string   `json:"client_addr"`
-// MacAddr      string   `json:"mac_addr"`
-// MacAddrs     []string `json:"mac_addrs"`
-// }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Profile {
@@ -43,20 +19,35 @@ pub struct Profile {
     server_addr: String,
     client_addr: String,
     mac_addr: String,
-    mac_addrs: Vec<String>,
+    //mac_addrs: Vec<String>, // TODO: Possible null value, need to transform into empty vector before deserialisation
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+struct ProfilePost<'p> {
+    id: &'p str,
+    mode: &'p str,
+    password: &'p str,
 }
 
 impl Client {
-    pub fn get_profile(&self) -> Result<Profile> {
+    // Get currently active profiles
+    pub fn query_active_profiles(&self) -> Result<HashMap<String, Profile>> {
         let res = socket::get(self, "/profile")?;
-        Ok(serde_json::from_str::<Profile>(&res.body)?)
+        Ok(serde_json::from_str::<HashMap<String, Profile>>(&res.body)?)
     }
 
-    pub fn post_profile(&self, body: &str) -> std::result::Result<String, io::Error> {
-        socket::post(self, "/profile", body)
+    pub fn connect_profile(&self, profile_id: &str, password: &str) -> Result<bool> {
+        let body = serde_json::to_string(&ProfilePost {
+            id: profile_id,
+            mode: "ovpn", // TODO: Support other modes
+            password,
+        })?;
+
+        Ok(socket::post(self, "/profile", &body)?.success)
     }
 
-    //pub fn delete_profile(&self) -> Result<String, Box<dyn Error>>  {
-    //    proxy::delete(self, "/profile")
-    //}
+    pub fn disconnect_profile(&self, profile_id: &str) -> Result<bool> {
+        let body = format!("{{\"id\": \"{}\"}}", profile_id);
+        Ok(socket::delete(self, "/profile", &body)?.success)
+    }
 }
