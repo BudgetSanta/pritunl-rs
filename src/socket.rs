@@ -57,11 +57,14 @@ fn format_request(r: &Client, endpoint: &str, method: RequestVerb, body: &str) -
 }
 
 fn send_request(r: &Client, req: String) -> Result<String, io::Error> {
-    let mut socket = &r.client;
-    socket.write_all(req.as_bytes())?;
+    // TODO: Socket was closing for write after read, find better solution
+    //  than new connection for each request
+    let mut socket_connection = r.new_socket_connection();
+
+    socket_connection.write_all(req.as_bytes())?;
 
     let mut res = String::new();
-    socket.read_to_string(&mut res)?;
+    socket_connection.read_to_string(&mut res)?;
 
     Ok(res)
 }
@@ -74,8 +77,8 @@ fn parse_response(res: String) -> Response {
     let success = headers[..].contains("200 OK");
 
     Response {
+        success,
         headers,
         body,
-        success,
     }
 }
