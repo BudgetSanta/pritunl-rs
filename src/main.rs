@@ -4,10 +4,7 @@ use std::error::Error;
 fn main() -> Result<(), Box<dyn Error>> {
     let r = Client::new();
 
-    let profiles = r.get_system_profiles()?;
-    for p in profiles {
-        println!("{}", p.server)
-    }
+    println!("PROFILE: {:#?}", r.query_active_profiles()?);
 
     Ok(())
 }
