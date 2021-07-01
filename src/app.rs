@@ -37,7 +37,6 @@ pub struct Client {
     pub auth_key: String,
     pub prof_path: PathBuf,
     pub socket_path: String,
-    pub client: UnixStream,
     pub profiles: Vec<Profile>,
 }
 
@@ -45,12 +44,11 @@ impl Client {
     pub fn new() -> Self {
         let profile_path = get_profile_path().unwrap();
         let profiles = load_profiles(&profile_path);
-        let socket_path = "/var/run/pritunl.sock";
+        let socket_path = String::from("/var/run/pritunl.sock");
         Self {
             auth_key: get_auth_key().unwrap(),
             prof_path: profile_path,
-            socket_path: String::from(socket_path),
-            client: UnixStream::connect(socket_path).unwrap(),
+            socket_path: socket_path,
             profiles,
         }
     }
