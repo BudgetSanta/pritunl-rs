@@ -1,10 +1,9 @@
 use core::time;
-use pritunl_rs::Client;
+use pritunl::Client;
 use std::{
     error::Error,
     thread,
     time::{Duration, SystemTime},
-    vec,
 };
 
 fn main() -> Result<(), Box<dyn Error>> {
