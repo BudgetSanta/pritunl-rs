@@ -42,13 +42,13 @@ pub struct Client {
 
 impl Client {
     pub fn new() -> Self {
-        let profile_path = get_profile_path().unwrap();
-        let profiles = load_profiles(&profile_path);
+        let prof_path = get_profile_path().unwrap();
+        let profiles = load_profiles(&prof_path);
         let socket_path = String::from("/var/run/pritunl.sock");
         Self {
             auth_key: get_auth_key().unwrap(),
-            prof_path: profile_path,
-            socket_path: socket_path,
+            prof_path,
+            socket_path,
             profiles,
         }
     }
