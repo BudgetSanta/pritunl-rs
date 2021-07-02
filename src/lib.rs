@@ -1,7 +1,8 @@
-mod app;
-mod error;
-mod service;
-mod socket;
+pub mod app;
+pub mod service;
 
-pub use app::{Client, Profile};
+pub use app::Client;
 pub use error::Result;
+
+pub mod error;
+mod socket;
