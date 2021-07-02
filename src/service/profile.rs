@@ -5,20 +5,20 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Profile {
-    id: String,
-    mode: String,
-    iface: String,
-    tun_iface: String,
+    pub id: String,
+    pub mode: String,
+    pub iface: String,
+    pub tun_iface: String,
     //routes: Vec<Routes>,
     //routes6: Vec<Routes>,
-    reconnect: bool,
-    status: String,
-    timestamp: i64,
-    gateway_addr: String,
-    gateway_addr6: String,
-    server_addr: String,
-    client_addr: String,
-    mac_addr: String,
+    pub reconnect: bool,
+    pub status: String,
+    pub timestamp: i64,
+    pub gateway_addr: String,
+    pub gateway_addr6: String,
+    pub server_addr: String,
+    pub client_addr: String,
+    pub mac_addr: String,
     //mac_addrs: Vec<String>, // TODO: Possible null value, need to transform into empty vector before deserialisation
 }
 
